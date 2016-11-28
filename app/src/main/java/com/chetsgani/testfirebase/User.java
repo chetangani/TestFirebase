@@ -9,8 +9,6 @@ import com.google.firebase.database.IgnoreExtraProperties;
 @IgnoreExtraProperties
 public class User {
 
-    public String username="";
-    public String address="";
     public String msg="";
 
     public User() {
@@ -19,25 +17,6 @@ public class User {
 
     public User(String msg) {
         this.msg = msg;
-    }
-
-    public User(String username, String address) {
-        this.username = username;
-        this.address = address;
-    }
-
-    public User(String username, String address, String msg) {
-        this.username = username;
-        this.address = address;
-        this.msg = msg;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getAddress() {
-        return address;
     }
 
     public String getMsg() {

@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.IBinder;
@@ -17,12 +18,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import static com.chetsgani.testfirebase.MainActivity.SHARED_PREF;
+import static com.chetsgani.testfirebase.MainActivity.USER_NAME;
+
 /**
  * Created by cgani on 28-Nov-16.
  */
 
 public class NotifyListener extends Service {
+
+    SharedPreferences sharedPreferences;
     public static boolean notify = false;
+    public static boolean notificationlistener = false;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -34,13 +41,15 @@ public class NotifyListener extends Service {
         Log.d("debug", "Notification checking");
         final DatabaseReference myRef = FirebaseDatabase.getInstance().getReference();
 
-        myRef.child("users").child("Chetan G").addValueEventListener(new ValueEventListener() {
+        //Opening shared preference
+        sharedPreferences = getSharedPreferences(SHARED_PREF, MODE_PRIVATE);
+        notificationlistener = true;
+
+        myRef.child("users").child(sharedPreferences.getString(USER_NAME, "")).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 try {
                     User value = dataSnapshot.getValue(User.class);
-                    /*Log.d("debug", "Value name: "+value.getUsername());
-                    Log.d("debug", "Value address: "+value.getAddress());*/
                     Log.d("debug", "Value msg: "+value.getMsg());
                     String msg = value.getMsg();
                     if (!msg.equals("")) {
@@ -90,6 +99,7 @@ public class NotifyListener extends Service {
 
     @Override
     public void onDestroy() {
+        notificationlistener = false;
         Log.d("debug", "Service Stopped");
     }
 }
