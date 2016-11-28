@@ -21,7 +21,7 @@ public class FirstActivity extends AppCompatActivity {
         user_rb_btn = (RadioButton) findViewById(R.id.user_radio);
 
         if (!NotifyListener.notificationlistener) {
-        /*startService(new Intent(FirstActivity.this, NotifyListener.class));*/
+            startService(new Intent(FirstActivity.this, NotifyListener.class));
         }
 
         usergroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {

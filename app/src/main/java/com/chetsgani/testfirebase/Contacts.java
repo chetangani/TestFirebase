@@ -6,6 +6,8 @@ package com.chetsgani.testfirebase;
 
 public class Contacts {
     public String Username;
+    public String ConfirmedUser;
+    public boolean isSelected;
 
     public Contacts() {
     }
@@ -16,5 +18,25 @@ public class Contacts {
 
     public String getUsername() {
         return Username;
+    }
+
+    public void setUsername(String username) {
+        Username = username;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
+
+    public String getConfirmedUser() {
+        return ConfirmedUser;
+    }
+
+    public void setConfirmedUser(String confirmedUser) {
+        ConfirmedUser = confirmedUser;
     }
 }

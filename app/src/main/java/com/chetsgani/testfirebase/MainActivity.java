@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseDatabase database;
     DatabaseReference myRef;
-    Button submit_btn, stop_btn;
+    Button register_btn, stop_btn;
     TextInputEditText et_user;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference();
-        submit_btn = (Button) findViewById(R.id.submit_btn);
+        register_btn = (Button) findViewById(R.id.register_btn);
         stop_btn = (Button) findViewById(R.id.stop_service_btn);
 
         et_user = (TextInputEditText) findViewById(R.id.et_username);
@@ -56,10 +56,10 @@ public class MainActivity extends AppCompatActivity {
 
         /*startService(new Intent(MainActivity.this, NotifyListener.class));*/
 
-        submit_btn.setOnClickListener(new View.OnClickListener() {
+        register_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*if (sharedPreferences.getString(USER_NAME, "").equals("")) {
+                if (sharedPreferences.getString(USER_NAME, "").equals("")) {
                     if (!et_user.getText().toString().equals("")) {
                         String username = et_user.getText().toString();
                         String msg = "";
@@ -74,42 +74,26 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else {
                     Snackbar.make(v, "Device Already registered", Snackbar.LENGTH_LONG).show();
-                }*/
-                if (!et_user.getText().toString().equals("")) {
+                }
+                /*if (!et_user.getText().toString().equals("")) {
                     String username = et_user.getText().toString();
                     String msg = "";
-                    /*editor.putString(USER_NAME, username);
-                    editor.apply();*/
+                    *//*editor.putString(USER_NAME, username);
+                    editor.apply();*//*
 
                     User user = new User(msg);
 
                     myRef.child("users").child(username).setValue(user);
                 } else {
                     Snackbar.make(v, "Please enter your name", Snackbar.LENGTH_LONG).show();
-                }
+                }*/
             }
         });
 
         stop_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                myRef.child("users").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Log.d("debug", "Children Count: "+dataSnapshot.getChildrenCount());
-                        for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                            String username = postSnapshot.getKey();
-                            Log.d("debug", "user: "+username);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-                /*myRef.child("users").child("Chetan G").removeValue();
-                stopService(new Intent(MainActivity.this, NotifyListener.class));*/
+                stopService(new Intent(MainActivity.this, NotifyListener.class));
             }
         });
     }

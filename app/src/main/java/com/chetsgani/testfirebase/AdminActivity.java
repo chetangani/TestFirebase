@@ -92,6 +92,27 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
                     }
                 });
                 break;
+
+            case R.id.send_btn:
+                ArrayList<Contacts> confirmedarray = new ArrayList<>();
+                ArrayList<Contacts> arrayList = contactAdapter.getContacts();
+                for (int i = 0; i < arrayList.size(); i++) {
+                    Contacts contacts = arrayList.get(i);
+                    if (contacts.isSelected() == true) {
+                        String SelectedContact = contacts.getUsername().toString();
+                        Contacts confirmed = new Contacts();
+                        confirmed.setConfirmedUser(SelectedContact);
+                        confirmedarray.add(confirmed);
+                    }
+                }
+                String selected = "";
+                for (int i = 0; i < confirmedarray.size(); i++) {
+                    Contacts con = confirmedarray.get(i);
+
+                    selected += con.getConfirmedUser().toString() + "\n";
+                }
+                Toast.makeText(AdminActivity.this, selected , Toast.LENGTH_SHORT).show();
+                break;
         }
     }
 }
