@@ -28,14 +28,14 @@ public class FirstActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 if (admin_rb_btn.isChecked()) {
+                    admin_rb_btn.setChecked(false);
                     Intent intent = new Intent(FirstActivity.this, AdminActivity.class);
                     startActivity(intent);
-                    finish();
                 } else {
                     if (user_rb_btn.isChecked()) {
+                        user_rb_btn.setChecked(false);
                         Intent intent = new Intent(FirstActivity.this, MainActivity.class);
                         startActivity(intent);
-                        finish();
                     }
                 }
             }

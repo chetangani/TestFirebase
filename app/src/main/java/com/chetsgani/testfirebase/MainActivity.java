@@ -1,5 +1,6 @@
 package com.chetsgani.testfirebase;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.design.widget.Snackbar;
@@ -8,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -58,35 +60,39 @@ public class MainActivity extends AppCompatActivity {
 
         register_btn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                if (sharedPreferences.getString(USER_NAME, "").equals("")) {
-                    if (!et_user.getText().toString().equals("")) {
-                        String username = et_user.getText().toString();
-                        String msg = "";
-                        editor.putString(USER_NAME, username);
-                        editor.apply();
-
-                        User user = new User(msg);
-
-                        myRef.child("users").child(sharedPreferences.getString(USER_NAME, "")).setValue(user);
-                    } else {
-                        Toast.makeText(MainActivity.this, "Please enter your name", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Snackbar.make(v, "Device Already registered", Snackbar.LENGTH_LONG).show();
-                }
-                /*if (!et_user.getText().toString().equals("")) {
-                    String username = et_user.getText().toString();
+            public void onClick(final View v) {
+                InputMethodManager inputMgr = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMgr.hideSoftInputFromWindow(et_user.getWindowToken(), 0);
+                if (!et_user.getText().toString().equals("")) {
+                    final String username = et_user.getText().toString();
                     String msg = "";
-                    *//*editor.putString(USER_NAME, username);
-                    editor.apply();*//*
 
-                    User user = new User(msg);
+                    final User user = new User(msg);
 
-                    myRef.child("users").child(username).setValue(user);
+                    myRef.child("users").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.getKey().equals(sharedPreferences.getString(USER_NAME, ""))) {
+                                Snackbar.make(v, "Device Already registered", Snackbar.LENGTH_LONG).show();
+                                Log.d("debug", "Already existed");
+                            } else {
+                                Log.d("debug", "Created new one...");
+                                editor.putString(USER_NAME, username);
+                                editor.apply();
+                                myRef.child("users").child(sharedPreferences.getString(USER_NAME, "")).setValue(user);
+                                et_user.setText("");
+                                Snackbar.make(v, "Successfully Registered", Snackbar.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
                 } else {
-                    Snackbar.make(v, "Please enter your name", Snackbar.LENGTH_LONG).show();
-                }*/
+                    Toast.makeText(MainActivity.this, "Please enter your name", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

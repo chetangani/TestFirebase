@@ -1,6 +1,8 @@
 package com.chetsgani.testfirebase;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.Handler;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -19,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Timer;
 
 public class AdminActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -34,6 +38,7 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
 
     DatabaseReference myRef;
     static ProgressDialog dialog = null;
+    InputMethodManager inputMgr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,12 +64,15 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         contacts_view.setHasFixedSize(true);
         contacts_view.setLayoutManager(new LinearLayoutManager(this));
         contacts_view.setAdapter(contactAdapter);
+
+        inputMgr = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.get_contacts_btn:
+                inputMgr.hideSoftInputFromWindow(et_msg.getWindowToken(), 0);
                 dialog = ProgressDialog.show(AdminActivity.this, "", "Fetching Contacts", true);
                 myRef.child("users").addValueEventListener(new ValueEventListener() {
                     @Override
@@ -82,6 +90,7 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
                                 contactAdapter.notifyDataSetChanged();
                             }
                         } else {
+                            dialog.dismiss();
                             Toast.makeText(AdminActivity.this, "No Contacts to show..", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -94,24 +103,50 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
                 break;
 
             case R.id.send_btn:
-                ArrayList<Contacts> confirmedarray = new ArrayList<>();
-                ArrayList<Contacts> arrayList = contactAdapter.getContacts();
-                for (int i = 0; i < arrayList.size(); i++) {
-                    Contacts contacts = arrayList.get(i);
-                    if (contacts.isSelected() == true) {
-                        String SelectedContact = contacts.getUsername().toString();
-                        Contacts confirmed = new Contacts();
-                        confirmed.setConfirmedUser(SelectedContact);
-                        confirmedarray.add(confirmed);
+                inputMgr.hideSoftInputFromWindow(et_msg.getWindowToken(), 0);
+                if (!et_msg.getText().toString().equals("")) {
+                    if (contacts_list.size() > 0) {
+                        String msg = et_msg.getText().toString();
+                        final User user = new User(msg);
+                        final ArrayList<Contacts> confirmedarray = new ArrayList<>();
+                        ArrayList<Contacts> arrayList = contactAdapter.getContacts();
+                        for (int i = 0; i < arrayList.size(); i++) {
+                            Contacts contacts = arrayList.get(i);
+                            if (contacts.isSelected() == true) {
+                                String SelectedContact = contacts.getUsername().toString();
+                                Contacts confirmed = new Contacts();
+                                confirmed.setConfirmedUser(SelectedContact);
+                                confirmedarray.add(confirmed);
+                            }
+                        }
+                        Handler handler = new Handler();
+                        for (int i = 0; i < confirmedarray.size(); i++) {
+                            final int finalI = i;
+                            Log.d("debug", "i: "+finalI);
+                            Contacts con = confirmedarray.get(finalI);
+                            myRef.child("users").child(con.getConfirmedUser().toString()).setValue(user);
+                            if (confirmedarray.size()-1 == finalI) {
+                                Log.d("debug", "Message sent to all selected users");
+                                Toast.makeText(AdminActivity.this, "Message sent to all selected users",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                finish();
+                            }
+                        }, 1500);
+                    } else {
+                        Toast.makeText(AdminActivity.this, "Please select any user to send notification..", Toast.LENGTH_SHORT).show();
                     }
+                } else {
+                    Toast.makeText(AdminActivity.this, "Please enter Message", Toast.LENGTH_SHORT).show();
                 }
-                String selected = "";
-                for (int i = 0; i < confirmedarray.size(); i++) {
-                    Contacts con = confirmedarray.get(i);
+                break;
 
-                    selected += con.getConfirmedUser().toString() + "\n";
-                }
-                Toast.makeText(AdminActivity.this, selected , Toast.LENGTH_SHORT).show();
+            case R.id.cancel_btn:
+                finish();
                 break;
         }
     }

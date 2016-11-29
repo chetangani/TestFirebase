@@ -28,7 +28,6 @@ import static com.chetsgani.testfirebase.MainActivity.USER_NAME;
 public class NotifyListener extends Service {
 
     SharedPreferences sharedPreferences;
-    public static boolean notify = false;
     public static boolean notificationlistener = false;
 
     @Override
@@ -53,16 +52,11 @@ public class NotifyListener extends Service {
                     Log.d("debug", "Value msg: "+value.getMsg());
                     String msg = value.getMsg();
                     if (!msg.equals("")) {
-                        if (!notify) {
-                            showNotification(msg);
-                            notify = true;
-                            msg = "";
-                            value = new User(msg);
-                            myRef.child("users").child("Chetan G").setValue(value);
-                            Log.d("debug", "Notification shown and changed values");
-                        } else {
-                            Log.d("debug", "already received notification");
-                        }
+                        showNotification(msg);
+                        msg = "";
+                        value = new User(msg);
+                        myRef.child("users").child(sharedPreferences.getString(USER_NAME, "")).setValue(value);
+                        Log.d("debug", "Notification shown and changed values");
                     } else {
                         Log.d("debug", "no msg still");
                     }
@@ -88,7 +82,7 @@ public class NotifyListener extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
         builder.setContentIntent(pendingIntent);
         builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
-        builder.setContentTitle("Firebase Push Notification");
+        builder.setContentTitle("Push Notification");
         builder.setContentText(msg);
         builder.setDefaults(Notification.DEFAULT_ALL);
         builder.setAutoCancel(true);
